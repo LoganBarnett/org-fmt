@@ -50,6 +50,7 @@ textwrap = "0.16"
 
 # Testing
 tempfile = "3"
+orgize = "0.9"
 
 # OpenMetrics/Prometheus
 prometheus = "0.13"
