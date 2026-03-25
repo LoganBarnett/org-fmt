@@ -1,0 +1,18 @@
+[package]
+name = "org-fmt-lib"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+tracing = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+tap = { workspace = true }  # For method chaining, reduces superfluous locals
+textwrap = { workspace = true }
+
+[dev-dependencies]
+cargo-husky = { version = "1", default-features = false, features = ["user-hooks"] }

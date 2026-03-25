@@ -1,0 +1,104 @@
+#+title:     org-fmt
+#+language:  en
+
+* Introduction
+
+=org-fmt= is an opinionated formatter for [[https://orgmode.org][org-mode]] documents.  It normalises
+whitespace and text layout so that org files look consistent regardless of
+which editor produced them.
+
+The primary goal for the first release is correct, safe wrapping: only plain
+prose paragraphs are reflowed; every structured element is left untouched.
+
+* Installation
+
+** From source
+
+#+begin_src sh
+git clone ssh://git@gitea.proton:2222/logan/org-fmt.git
+cd org-fmt
+cargo build --release
+# binary is at target/release/org-fmt-cli
+#+end_src
+
+A Nix dev shell is provided.  If you have Nix and direnv installed:
+
+#+begin_src sh
+direnv allow   # activates the dev shell automatically
+#+end_src
+
+* Usage
+
+#+begin_src sh
+# Format a file in-place
+org-fmt-cli --in-place file.org
+
+# Write to stdout (default)
+org-fmt-cli file.org
+
+# Read from stdin
+cat file.org | org-fmt-cli
+#+end_src
+
+* Known Limitations and Edge Cases
+
+This section documents wrapping behaviours that are explicitly deferred or
+require careful handling in future work.
+
+** Elements that are never wrapped (current implementation)
+
+- Headings (lines beginning with one or more =*= followed by a space).
+- Lines beginning with =#+= — keywords, directives, and affiliated keywords
+  (=#+ATTR_HTML:=, =#+CAPTION:=, =#+NAME:=, etc.).
+- Block delimiters and their contents: =#+begin_…= / =#+end_…= of any kind
+  (=src=, =example=, =quote=, =export=, …).
+- Tables (lines beginning with =|=).
+- Property drawers (=:PROPERTIES:= … =:END:=) and all other drawer types
+  (=:LOGBOOK:=, custom drawers).
+- Comment lines (lines beginning with =# =).
+- Org escape lines (lines beginning with =,=) that appear inside blocks to
+  prevent =#+= from being interpreted as a keyword.
+- Blank lines — these delimit paragraphs and are preserved as-is.
+
+** Elements that are wrapped
+
+Plain prose paragraphs: contiguous runs of non-blank lines that do not start
+with any of the structural prefixes above.  Each paragraph is wrapped
+independently at 80 columns; paragraphs are never joined across a blank line.
+
+** Known deferred edge cases
+
+The following are out of scope for the initial implementation but should be
+handled in later work:
+
+- *Lists* — unordered (=- =, =+ =, =* =) and ordered (=1.= / =1)=) list items
+  share the "separated by blank line" assumption for now.  Continuation lines
+  (indented body text belonging to a list item) may need special treatment so
+  that they wrap at the correct indentation level.
+- *Footnote definitions* — lines of the form =[fn:label] text= start a
+  footnote that may span multiple indented continuation lines.
+- *LaTeX environments* — =\begin{…}= / =\end{…}= blocks should be treated like
+  =#+begin_…= blocks and never wrapped.
+- *Inline markup boundary conditions* — wrapping must not split an inline
+  markup pair (=*bold*=, =/italic/=, ==code==, =~verbatim~=, =_underline_=,
+  =+strikethrough+=) across a line break in a way that breaks the syntax.
+- *Fixed-width areas* — lines beginning with =: = (colon space) are fixed-width
+  examples and should not be wrapped.
+- *Affiliated keywords with no blank line* — an affiliated keyword directly
+  above an element (e.g., =#+CAPTION:= above a table) must not be separated
+  from its element by the formatter.
+- *Clock and planning lines* — =SCHEDULED:=, =DEADLINE:=, =CLOSED:=, =CLOCK:=
+  lines in a heading's body must not be wrapped.
+
+* Contributing
+
+#+begin_src sh
+# Run the full test suite
+cargo test --workspace
+
+# Check formatting
+cargo fmt --check
+
+# Lint
+cargo clippy --workspace
+#+end_src

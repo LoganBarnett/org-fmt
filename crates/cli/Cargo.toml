@@ -1,0 +1,26 @@
+[package]
+name = "org-fmt-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[[bin]]
+name = "org-fmt-cli"
+path = "src/main.rs"
+
+[dependencies]
+org-fmt-lib = { workspace = true }
+clap = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+thiserror = { workspace = true }
+tap = { workspace = true }  # For method chaining, reduces superfluous locals
+
+[dev-dependencies]
+tempfile = { workspace = true }
