@@ -1,0 +1,47 @@
+#+title:     org-fmt TODO
+#+language:  en
+
+* Upstream
+
+** TODO File orgize issue (or PR) for multi-line link parsing
+
+orgize 0.9 does not parse bracket links whose description spans a line break.
+Emacs org-mode handles them correctly (user-verified).
+
+The test =orgize_multiline_link_in_input_is_preserved= in
+=crates/lib/tests/format.rs= demonstrates the discrepancy: orgize returns zero
+links for input containing =[[link text\nthat spans a line]]= while our
+formatter's output (which joins the lines) is parsed correctly.
+
+Before filing, write or review the report and decide whether to open an issue
+or submit a PR with a fix.  Relevant context:
+
+- Repository: https://github.com/PoiScript/orgize
+- Our test can serve as a minimal reproducer
+- The fix would be in the link parser — allow the bracket link regex (or
+  equivalent) to match across at most one newline, consistent with how
+  org-mode handles inline markup spanning lines
+
+* Formatter features
+
+** TODO Handle multi-paragraph list items
+
+A list item whose body contains a blank line followed by more indented text
+(a second paragraph within the item) currently ends the item at the blank line.
+The indented text after the blank is treated as a new paragraph.
+
+** TODO Footnote definition wrapping
+
+Lines of the form =[fn:label] text= start a footnote that may have indented
+continuation lines.  Currently passed through unchanged.
+
+** TODO LaTeX environment pass-through
+
+=\begin{...}= / =\end{...}= blocks should be treated like =#+begin_...= blocks
+and never wrapped.
+
+** TODO Clock and planning line detection
+
+=SCHEDULED:=, =DEADLINE:=, =CLOSED:=, and =CLOCK:= lines in a heading's body
+must not be wrapped.  Currently they would be classified as =Plain= and
+potentially re-flowed.
