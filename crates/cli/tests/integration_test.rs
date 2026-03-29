@@ -11,13 +11,13 @@ fn get_binary_path() -> PathBuf {
 
   path.pop(); // remove test executable name
   path.pop(); // remove deps dir
-  path.push("org-fmt-cli");
+  path.push("org-fmt");
 
   if !path.exists() {
     path.pop();
     path.pop();
     path.push("debug");
-    path.push("org-fmt-cli");
+    path.push("org-fmt");
   }
 
   path
@@ -39,7 +39,9 @@ fn run(args: &[&str], stdin: Option<&str>) -> std::process::Output {
       .unwrap()
       .write_all(input.as_bytes())
       .expect("Failed to write stdin");
-    child.wait_with_output().expect("Failed to wait for process")
+    child
+      .wait_with_output()
+      .expect("Failed to wait for process")
   } else {
     cmd.output().expect("Failed to execute binary")
   }
@@ -58,14 +60,18 @@ fn test_version_flag() {
   let output = run(&["--version"], None);
   assert!(output.status.success());
   let stdout = String::from_utf8_lossy(&output.stdout);
-  assert!(stdout.contains("org-fmt-cli"));
+  assert!(stdout.contains("org-fmt"));
 }
 
 #[test]
 fn stdin_short_paragraph_passes_through() {
   let input = "This is a short paragraph.\n";
   let output = run(&[], Some(input));
-  assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+  assert!(
+    output.status.success(),
+    "{}",
+    String::from_utf8_lossy(&output.stderr)
+  );
   assert_eq!(String::from_utf8_lossy(&output.stdout), input);
 }
 
@@ -74,7 +80,11 @@ fn stdin_long_paragraph_is_wrapped() {
   let input = "This is a very long paragraph that definitely exceeds the eighty \
                character column limit and should therefore be wrapped by the formatter.\n";
   let output = run(&[], Some(input));
-  assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+  assert!(
+    output.status.success(),
+    "{}",
+    String::from_utf8_lossy(&output.stderr)
+  );
   let stdout = String::from_utf8_lossy(&output.stdout);
   for line in stdout.lines() {
     assert!(line.len() <= 80, "Line exceeds 80 chars: {:?}", line);
@@ -89,7 +99,11 @@ fn file_argument_formats_file() {
   tmp.write_all(input.as_bytes()).unwrap();
 
   let output = run(&[tmp.path().to_str().unwrap()], None);
-  assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+  assert!(
+    output.status.success(),
+    "{}",
+    String::from_utf8_lossy(&output.stderr)
+  );
   let stdout = String::from_utf8_lossy(&output.stdout);
   for line in stdout.lines() {
     assert!(line.len() <= 80, "Line exceeds 80 chars: {:?}", line);
@@ -104,7 +118,11 @@ fn in_place_modifies_file() {
   tmp.write_all(input.as_bytes()).unwrap();
 
   let output = run(&["--in-place", tmp.path().to_str().unwrap()], None);
-  assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+  assert!(
+    output.status.success(),
+    "{}",
+    String::from_utf8_lossy(&output.stderr)
+  );
 
   let contents = std::fs::read_to_string(tmp.path()).unwrap();
   for line in contents.lines() {
@@ -114,7 +132,8 @@ fn in_place_modifies_file() {
 
 #[test]
 fn headings_not_wrapped_via_cli() {
-  let input = "* This is a very long heading that exceeds the eighty character limit \
+  let input =
+    "* This is a very long heading that exceeds the eighty character limit \
                and must not be reflowed by the formatter\n";
   let output = run(&[], Some(input));
   assert!(output.status.success());

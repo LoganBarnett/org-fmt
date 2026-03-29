@@ -1,4 +1,4 @@
-//! org-fmt-cli — command-line org-mode document formatter
+//! org-fmt — command-line org-mode document formatter
 
 mod config;
 mod logging;
@@ -60,16 +60,19 @@ fn run(config: Config) -> Result<(), ApplicationError> {
   } else {
     for path in &config.files {
       debug!(?path, "Formatting file");
-      let input =
-        std::fs::read_to_string(path).map_err(|source| ApplicationError::FileRead {
+      let input = std::fs::read_to_string(path).map_err(|source| {
+        ApplicationError::FileRead {
           path: path.clone(),
           source,
-        })?;
+        }
+      })?;
       let output = format_org(&input);
       if config.in_place {
-        std::fs::write(path, output).map_err(|source| ApplicationError::FileWrite {
-          path: path.clone(),
-          source,
+        std::fs::write(path, output).map_err(|source| {
+          ApplicationError::FileWrite {
+            path: path.clone(),
+            source,
+          }
         })?;
       } else {
         print!("{output}");

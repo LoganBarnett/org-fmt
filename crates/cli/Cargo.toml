@@ -1,5 +1,5 @@
 [package]
-name = "org-fmt-cli"
+name = "org-fmt"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -8,7 +8,7 @@ repository.workspace = true
 publish = false
 
 [[bin]]
-name = "org-fmt-cli"
+name = "org-fmt"
 path = "src/main.rs"
 
 [dependencies]

@@ -42,12 +42,11 @@
       # CRATE:cli:begin
       # CLI application
       cli = {
-        name = "org-fmt-cli";
-        binary = "org-fmt-cli";
+        name = "org-fmt";
+        binary = "org-fmt";
         description = "Command-line org-mode formatter";
       };
       # CRATE:cli:end
-
 
       # Note: The 'lib' crate is not included here as it doesn't produce a
       # binary.

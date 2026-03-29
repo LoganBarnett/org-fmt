@@ -18,7 +18,7 @@ prose paragraphs are reflowed; every structured element is left untouched.
 git clone ssh://git@gitea.proton:2222/logan/org-fmt.git
 cd org-fmt
 cargo build --release
-# binary is at target/release/org-fmt-cli
+# binary is at target/release/org-fmt
 #+end_src
 
 A Nix dev shell is provided.  If you have Nix and direnv installed:
@@ -31,13 +31,13 @@ direnv allow   # activates the dev shell automatically
 
 #+begin_src sh
 # Format a file in-place
-org-fmt-cli --in-place file.org
+org-fmt --in-place file.org
 
 # Write to stdout (default)
-org-fmt-cli file.org
+org-fmt file.org
 
 # Read from stdin
-cat file.org | org-fmt-cli
+cat file.org | org-fmt
 #+end_src
 
 * Known Limitations and Edge Cases
